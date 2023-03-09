@@ -8,26 +8,53 @@ const responseFormatter = require('./responseFormatter')
 app.use(bodyParser.json())
 
 // Route
-app.get('/', (req, res) => {
+app.get('/mahasiswa', (req, res) => {
     const query = "SELECT * FROM mahasiswa"
-    
-    db.query(query, (err, data) => {
-        // Result
-        responseFormatter(200, data, "Success", res)
-    })
-})
-
-app.get('/find', (req, res) => {
-    const query = "SELECT nama FROM mahasiswa WHERE npm =" + req.query.npm
 
     db.query(query, (err, data) => {
         responseFormatter(200, data, "OK", res)
     })
 })
 
-app.post('/login', (req,res) => {
-    console.log({ requestFromOutside : req.body })
-    res.send("Login Berhasil !")    
+app.get('/mahasiswa/:npm', (req, res) => {
+    const npm = req.params.npm
+    const query = "SELECT * FROM mahasiswa WHERE npm =" + npm
+
+    db.query(query, (err, data) => {
+        if(err) throw err
+        responseFormatter(200, data, "OK", res)
+    })
+})
+
+app.post('/mahasiswa', (req,res) => {
+    const { nama, npm, kelas, alamat } = req.body
+    const query = `INSERT INTO mahasiswa (npm, nama, kelas, alamat) VALUES ('${npm}', '${nama}', '${kelas}', '${alamat}')`
+    
+    db.query(query, (err, data) => {
+        if(err) throw err
+        responseFormatter(200, data, "OK", res)
+    })
+})
+
+app.put('/mahasiswa/:npm', (req,res) => {
+    const npm = req.params.npm
+    const { nama, kelas, alamat } = req.body
+    const query = `UPDATE mahasiswa SET nama = '${nama}', kelas = '${kelas}', alamat = '${alamat}' WHERE npm = ${npm}`
+
+    db.query(query, (err, data) => {
+        if(err) throw err
+        responseFormatter(200, data, "OKAY", res)
+    }) 
+})
+
+app.delete('/mahasiswa/:npm', (req,res) => {
+    const npm = req.params.npm
+    const query = `DELETE FROM mahasiswa WHERE npm = ${npm}`
+    
+    db.query(query, (err, data) => {
+        if(err) throw err
+        responseFormatter(200, data, "DELETED", res)
+    })  
 })
 
 // Serve
