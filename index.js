@@ -2,18 +2,27 @@ const express = require('express')
 const app = express()
 const port = 3000
 const bodyParser = require('body-parser')
+const db = require('./connection')
+const responseFormatter = require('./responseFormatter')
 
 app.use(bodyParser.json())
 
 // Route
 app.get('/', (req, res) => {
-    res.statusCode = 200
-    res.send('Howmieeee')
+    const query = "SELECT * FROM mahasiswa"
+    
+    db.query(query, (err, data) => {
+        // Result
+        responseFormatter(200, data, "Success", res)
+    })
 })
 
-app.get('/hello', (req, res) => {
-    console.log({ reqFromQuery : req.query })
-    res.send('Hello World!')
+app.get('/find', (req, res) => {
+    const query = "SELECT nama FROM mahasiswa WHERE npm =" + req.query.npm
+
+    db.query(query, (err, data) => {
+        responseFormatter(200, data, "OK", res)
+    })
 })
 
 app.post('/login', (req,res) => {
